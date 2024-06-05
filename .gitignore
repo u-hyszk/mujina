@@ -8,3 +8,9 @@ wheels/
 
 # venv
 .venv
+
+# vscode
+.vscode/
+
+# zip files
+*.zip
