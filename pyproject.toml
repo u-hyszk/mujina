@@ -7,7 +7,6 @@ authors = [
 ]
 dependencies = [
     "requests>=2.32.3",
-    "pypdf>=4.2.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -26,8 +25,4 @@ allow-direct-references = true
 [tool.hatch.build.targets.wheel]
 packages = ["src/mujina"]
 
-[tool.rye.scripts]
-test = { cmd = "mkdir -p ok", description = "Run the tests" }
-bulid = { cmd = "mkdir -p bulid ; cp -r src/mujina/* build/ ; cp -r .venv/lib/python3.10/site-packages/* build/", description = "Build the mujina.zip" }
-build_packages = { cmd = "cd .venv/lib/python3.10/site-packages && zip -r ../../../../mujina.zip .", description = "Build the mujina.zip" }
-build_src = { cmd = "cd src/mujina && zip -r mujina.zip lambda_function.py", description = "Build the mujina.zip" }
+
