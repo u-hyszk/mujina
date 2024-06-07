@@ -5,7 +5,6 @@ import re
 from io import BytesIO
 
 import requests
-from pypdf import PdfReader
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
@@ -42,7 +41,9 @@ def post_message_to_slack(channel, message):
         "channel": channel,
     }
     LOGGER.info(f"Header: {headers} Data: {data}")
-    res = requests.post(url, headers=headers, data=json.dumps(data))
+    res = requests.post(
+        url, headers=headers, data=json.dumps(data, ensure_ascii=False).encode("utf-8")
+    )
     res.raise_for_status()
     LOGGER.info(f"status: {res.status_code} content: {res.content}")
     return res.json()
@@ -58,15 +59,38 @@ def download_pdf(file_url):
     return pdf_stream
 
 
-def extract_text_from_pdf(pdf_stream):
-    reader = PdfReader(pdf_stream)
-    n_pages = len(reader.pages)
-    texts = []
-    for page_idx in range(n_pages):
-        page = reader.pages[page_idx]
-        page_text = page.extract_text()
-        texts.append(page_text)
-    return "".join(texts)
+# def extract_text_from_pdf(pdf_stream):
+#     reader = PdfReader(pdf_stream)
+#     n_pages = len(reader.pages)
+#     texts = []
+#     for page_idx in range(n_pages):
+#         page = reader.pages[page_idx]
+#         page_text = page.extract_text()
+#         texts.append(page_text)
+#     return "".join(texts)
+
+# from pdfminer.converter import TextConverter
+# from pdfminer.layout import LAParams
+# from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
+# from pdfminer.pdfpage import PDFPage
+
+
+# def extract_text_from_pdf(pdf_stream):
+#     resource_manager = PDFResourceManager()
+#     fake_file_handle = StringIO()
+#     converter = TextConverter(resource_manager, fake_file_handle, laparams=LAParams())
+#     page_interpreter = PDFPageInterpreter(resource_manager, converter)
+
+#     for page in PDFPage.get_pages(pdf_stream):
+#         page_interpreter.process_page(page)
+
+#     text = fake_file_handle.getvalue()
+
+#     # close open handles
+#     converter.close()
+#     fake_file_handle.close()
+
+#     return text
 
 
 def extract_message_from_slack(event):
