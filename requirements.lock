@@ -17,5 +17,9 @@ idna==3.7
     # via requests
 requests==2.32.3
     # via mujina
+slack-bolt==1.18.1
+    # via mujina
+slack-sdk==3.27.2
+    # via slack-bolt
 urllib3==2.2.1
     # via requests
