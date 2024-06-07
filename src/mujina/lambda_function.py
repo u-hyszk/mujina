@@ -5,6 +5,7 @@ import re
 from io import BytesIO
 
 import requests
+from pypdf import PdfReader
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
@@ -55,42 +56,21 @@ def download_pdf(file_url):
     }
     res = requests.get(file_url, headers=headers)
     res.raise_for_status()
-    pdf_stream = BytesIO(res.content)
-    return pdf_stream
+    pdf_bytes = BytesIO(res.content)
+    return pdf_bytes
 
 
-# def extract_text_from_pdf(pdf_stream):
-#     reader = PdfReader(pdf_stream)
-#     n_pages = len(reader.pages)
-#     texts = []
-#     for page_idx in range(n_pages):
-#         page = reader.pages[page_idx]
-#         page_text = page.extract_text()
-#         texts.append(page_text)
-#     return "".join(texts)
-
-# from pdfminer.converter import TextConverter
-# from pdfminer.layout import LAParams
-# from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
-# from pdfminer.pdfpage import PDFPage
-
-
-# def extract_text_from_pdf(pdf_stream):
-#     resource_manager = PDFResourceManager()
-#     fake_file_handle = StringIO()
-#     converter = TextConverter(resource_manager, fake_file_handle, laparams=LAParams())
-#     page_interpreter = PDFPageInterpreter(resource_manager, converter)
-
-#     for page in PDFPage.get_pages(pdf_stream):
-#         page_interpreter.process_page(page)
-
-#     text = fake_file_handle.getvalue()
-
-#     # close open handles
-#     converter.close()
-#     fake_file_handle.close()
-
-#     return text
+def extract_text_from_pdf(pdf_bytes):
+    reader = PdfReader(pdf_bytes)
+    n_pages = len(reader.pages)
+    texts = []
+    for page_idx in range(n_pages):
+        page = reader.pages[page_idx]
+        page_text = page.extract_text()
+        # TODO: page_textにした時点で日本語の文字化けが発生する
+        # 英語PDFの場合は問題ない
+        texts.append(page_text)
+    return "".join(texts)
 
 
 def extract_message_from_slack(event):
@@ -125,8 +105,9 @@ def lambda_handler(event, context):
         channel = extract_channel_from_slack(event)
         pdf_url = extract_pdf_url_from_slack(event)
         if pdf_url:
-            pdf_stream = download_pdf(pdf_url)
-            text = extract_text_from_pdf(pdf_stream)
+            pdf_bytes = download_pdf(pdf_url)
+            text = extract_text_from_pdf(pdf_bytes)
+            LOGGER.info(text)
             post_message_to_slack(channel, text)
         post_message_to_slack(channel, message)
     except Exception as e:
@@ -134,64 +115,3 @@ def lambda_handler(event, context):
         return respond("Error")
 
     return respond("OK")
-
-
-# import os
-# import json
-# import requests
-# import boto3
-# from PyPDF2 import PdfFileReader
-# from io import BytesIO
-
-# SLACK_BOT_TOKEN = os.environ['SLACK_BOT_TOKEN']
-
-# def download_pdf(file_url):
-#     headers = {
-#         'Authorization': f'Bearer {SLACK_BOT_TOKEN}'
-#     }
-#     response = requests.get(file_url, headers=headers)
-#     response.raise_for_status()
-#     return BytesIO(response.content)
-
-# def extract_text_from_pdf(pdf_stream):
-#     reader = PdfFileReader(pdf_stream)
-#     text = ""
-#     for page_num in range(reader.getNumPages()):
-#         page = reader.getPage(page_num)
-#         text += page.extractText()
-#     return text
-
-# def post_message_to_slack(channel, text):
-#     url = 'https://slack.com/api/chat.postMessage'
-#     headers = {
-#         'Authorization': f'Bearer {SLACK_BOT_TOKEN}',
-#         'Content-Type': 'application/json'
-#     }
-#     data = {
-#         'channel': channel,
-#         'text': text
-#     }
-#     response = requests.post(url, headers=headers, data=json.dumps(data))
-#     response.raise_for_status()
-#     return response.json()
-
-# def lambda_handler(event, context):
-#     body = json.loads(event['body'])
-
-#     if 'event' in body and body['event']['type'] == 'app_mention':
-#         event_data = body['event']
-#         channel = event_data['channel']
-
-#         if 'files' in event_data:
-#             for file_info in event_data['files']:
-#                 if file_info['filetype'] == 'pdf':
-#                     file_url = file_info['url_private']
-#                     pdf_stream = download_pdf(file_url)
-#                     text = extract_text_from_pdf(pdf_stream)
-#                     post_message_to_slack(channel, text)
-#                     break
-
-#     return {
-#         'statusCode': 200,
-#         'body': json.dumps('Success')
-#     }

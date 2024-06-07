@@ -15,7 +15,11 @@ charset-normalizer==3.3.2
     # via requests
 idna==3.7
     # via requests
+pypdf==4.2.0
+    # via mujina
 requests==2.32.3
     # via mujina
+typing-extensions==4.12.1
+    # via pypdf
 urllib3==2.2.1
     # via requests

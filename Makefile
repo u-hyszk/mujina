@@ -8,17 +8,22 @@ mk_bulid_dir: ## Make the build directory
 
 .PHONY: cp_package
 cp_package: ## Copy the package to the build directory
-	cp -r ./.venv/lib/python$(PYTHON_VERSION)/site-packages/ ./build/
+	cp -r ./.venv/lib/python$(PYTHON_VERSION)/site-packages/* ./build/
 
 .PHONY: cp_src
 cp_src: ## Copy the source to the build directory
-	cp -r ./src/$(PROJECT_NAME)/ ./build/
+	cp -r ./src/$(PROJECT_NAME)/* ./build/
 
 $(PROJECT_NAME).zip: ## Create the zip file
 	cd ./build && zip -r ../$(PROJECT_NAME).zip .
 
+.PHONY: clean
+clean:
+	rm -f ./$(PROJECT_NAME).zip
+
 .PHONY: build
 build:
+	$(MAKE) clean
 	$(MAKE) mk_bulid_dir
 	$(MAKE) cp_package
 	$(MAKE) cp_src
