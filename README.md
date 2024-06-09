@@ -1,4 +1,8 @@
 # “Mujina” found your den!
+
+![mujina_found_your_den](https://github.com/u-hyszk/mujina/assets/118411926/311fdfcc-c98f-420c-b10b-ddd30d3608fa)
+
+
 (作成中)Notionを活用した論文調査を支援するSlack bot
 
 Slackにメンション付き`@mujina`で論文のPDFを送信すると，論文の要約を生成してユーザーのNotionに記録していきます．
@@ -11,7 +15,13 @@ Slackにメンション付き`@mujina`で論文のPDFを送信すると，論文
 
 これを解消するために，(1)論文のおおまかな内容を高速に把握すると同時に(2)文献調査の証跡を残しながらオートメーションを行うことができるツールを開発したいと考えました．
 
+![mujina_background](https://github.com/u-hyszk/mujina/assets/118411926/ad91cf8d-5a89-4372-8eb3-433ad70e5a05)
+
+
 ## System Design
+
+![mujina_system_design](https://github.com/u-hyszk/mujina/assets/118411926/81d298bd-e12f-4e70-829a-1d29617a6b4c)
+
 
 |名称|選定理由|
 | --- | --- |
